@@ -56,6 +56,7 @@ CMD ["python", "bot_docker.py"]
 
 - The Docker version reads environment variables for configuration instead of hardcoded values.
 - The bot updates the message every 30 seconds.
+- You have to change the time zone in all `bot.py`.
 
 ## License
 
