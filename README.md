@@ -58,7 +58,3 @@ CMD ["python", "bot_docker.py"]
 - The bot updates the message every 30 seconds.
 - You have to change the time zone in all `bot.py`.
 
-## License
-
-This project is open-source. Feel free to modify and contribute!
-
