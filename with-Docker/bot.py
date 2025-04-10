@@ -5,9 +5,9 @@ import pytz
 import os
 from mcstatus import JavaServer
 
-TOKEN = os.getenv("DISCORD_TOKEN")  # Insert your Discord bot token with the 
-CHANNEL_ID = int(os.getenv("CHANNEL_ID")) # Insert the channel ID here (without quotes)
-server_ip = ""  # Insert the server IP here
+TOKEN = os.getenv("DISCORD_TOKEN") 
+CHANNEL_ID = int(os.getenv("CHANNEL_ID")) )
+server_ip = os.getenv("SERVER_IP")
 
 server = JavaServer.lookup(server_ip)
 
