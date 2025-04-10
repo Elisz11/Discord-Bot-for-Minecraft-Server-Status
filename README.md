@@ -41,15 +41,23 @@ This bot updates a Discord message with the status of a Minecraft Java Edition s
 The `Dockerfile` ensures the bot runs inside a lightweight Python environment with all dependencies pre-installed.
 
 ```dockerfile
-FROM python:3.9-slim
+FROM python:3.11-slim
+
 WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gcc libc6-dev && \
+    rm -rf /var/lib/apt/lists/*
+
 COPY requirements.txt .
+COPY bot.py .
+
 RUN pip install --no-cache-dir -r requirements.txt
-COPY bot_docker.py .
-ENV DISCORD_TOKEN="your_token_here"
-ENV CHANNEL_ID="your_channel_id"
-ENV SERVER_IP="your_server_ip"
-CMD ["python", "bot_docker.py"]
+
+RUN useradd -u 1000 -U botuser && chown -R botuser:botuser /app
+USER botuser
+
+CMD ["python", "bot.py"]
 ```
 
 ## Notes
