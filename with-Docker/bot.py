@@ -6,7 +6,7 @@ import os
 from mcstatus import JavaServer
 
 TOKEN = os.getenv("DISCORD_TOKEN") 
-CHANNEL_ID = int(os.getenv("CHANNEL_ID")) )
+CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 server_ip = os.getenv("SERVER_IP")
 
 server = JavaServer.lookup(server_ip)
