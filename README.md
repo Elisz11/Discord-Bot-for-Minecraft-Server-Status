@@ -36,7 +36,7 @@ This bot updates a Discord message with the status of a Minecraft Java Edition s
       discord-mc-bot
    ```
 
-## Dockerfile
+### Dockerfile
 
 The `Dockerfile` ensures the bot runs inside a lightweight Python environment with all dependencies pre-installed.
 
@@ -60,7 +60,7 @@ USER botuser
 CMD ["python", "bot.py"]
 ```
 
-## Notes
+### Notes
 
 - The Docker version reads environment variables for configuration instead of hardcoded values.
 - The bot updates the message every 30 seconds.
