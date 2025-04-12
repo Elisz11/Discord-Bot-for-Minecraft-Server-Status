@@ -30,7 +30,7 @@ async def fetch_status():
     except Exception as e:
         print(f"Error retrieving status: {e}")
         players = "Offline"
-        players_list = "Offline"
+        players_list = "`Offline`"
 
     return players, players_list
 
