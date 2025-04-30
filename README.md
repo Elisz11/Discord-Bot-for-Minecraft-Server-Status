@@ -1,4 +1,4 @@
-# Discord Bot for Minecraft Server Status
+# Discord Bot for Minecraft Servers
 
 This bot updates a Discord message with the status of a Minecraft Java Edition server. It is available in two versions:
 
