@@ -6,13 +6,64 @@ import os
 from mcstatus import JavaServer
 
 TOKEN = os.getenv("DISCORD_TOKEN") 
-CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
-server_ip = os.getenv("SERVER_IP")
-
-server = JavaServer.lookup(server_ip)
+GUILD_ID = os.getenv("GUILD_ID")
+CHANNEL_ID =  None
+server_ip = None
+server = None
+update_task = None
 
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
+tree = discord.app_commands.CommandTree(client)
+
+# Function to update the message
+@client.event
+async def on_ready():
+    print(f"Logged in as {client.user}")
+    await tree.sync(guild=discord.Object(id=GUILD_ID))
+
+# Function to get current time
+timezone = pytz.timezone("Europe/Rome")
+def get_time():
+    return datetime.now(timezone).strftime("%Y-%m-%d %H:%M:%S")
+
+# Slash command: /setip
+@tree.command(name="setip", description="Imposta l'indirizzo IP del server Minecraft", guild=discord.Object(id=GUILD_ID))
+async def setip(interaction: discord.Interaction, ip: str):
+    global server_ip, server
+    server_ip = ip
+    try:
+        server = JavaServer.lookup(server_ip)
+        await interaction.response.send_message(f"IP del server impostato a `{ip}`", ephemeral=True)
+    except Exception as e:
+        await interaction.response.send_message(f"Errore nel settare il server IP: `{e}`", ephemeral=True)
+
+    await start_update_loop()                                            
+
+# Slash command: /setchannel
+@tree.command(name="setchannel", description="Imposta il canale per gli aggiornamenti", guild=discord.Object(id=GUILD_ID))
+async def setchannel(interaction: discord.Interaction):
+    global CHANNEL_ID
+    CHANNEL_ID = interaction.channel.id
+    await interaction.response.send_message(f"Canale impostato: {interaction.channel.mention}", ephemeral=True)
+
+    await start_update_loop()
+
+async def start_update_loop():
+    global update_task
+    if update_task is None and CHANNEL_ID and server_ip:
+        channel = client.get_channel(CHANNEL_ID)
+        if not channel:
+            print("Errore: canale non trovato")
+            return
+
+        async for message in channel.history(limit=10):
+            if message.author == client.user:
+                break
+        else:
+            message = await channel.send("Retrieving messages")
+
+        update_task = client.loop.create_task(update_loop(message))
 
 # Function to fetch server status
 async def fetch_status():
@@ -34,30 +85,11 @@ async def fetch_status():
 
     return players, players_list
 
-# Function to get current time
-timezone = pytz.timezone("Europe/Rome")
-def get_time():
-    return datetime.now(timezone).strftime("%Y-%m-%d %H:%M:%S")
-
-# Function to update the message
-@client.event
-async def on_ready():
-    print(f"Logged in as {client.user}")
-
-    channel = client.get_channel(CHANNEL_ID)
-    if not channel:
-        print("Error: channel does not exist!")
-        return
-
-    async for message in channel.history(limit=10):
-        if message.author == client.user:
-            break
-    else:
-        message = await channel.send("Retrieving messages")
-
+# Message loop
+async def update_loop(message):
     while True:
         players, players_list = await fetch_status()
-        
+            
         if players != "Offline":
             players_status = "Online"
         else:
@@ -73,6 +105,6 @@ async def on_ready():
         )
 
         await message.edit(content=newMessage)
-        await asyncio.sleep(30)
+        await asyncio.sleep(60)
 
 client.run(TOKEN)
